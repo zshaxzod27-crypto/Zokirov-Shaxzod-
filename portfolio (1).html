@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --dark: #0F0F0E;
+    --accent: #B8A070;
+    --muted: #8A8580;
+    --card: #EFECE5;
+    --border: #DDD8CE;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    font-size: 16px;
+    line-height: 1.6;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--dark);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s, height 0.3s;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 60px;
+    background: rgba(247,245,240,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+  }
+  nav.scrolled { border-color: var(--border); }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.02em;
+    color: var(--dark);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.2s;
+    font-weight: 500;
+  }
+  .nav-links a:hover { color: var(--dark); }
+
+  /* Sections */
+  section { padding: 120px 60px; max-width: 1200px; margin: 0 auto; }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 140px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s forwards 0.2s;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    max-width: 800px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.9s forwards 0.4s;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-desc {
+    margin-top: 36px;
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 500px;
+    font-weight: 300;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s forwards 0.6s;
+  }
+  .hero-actions {
+    margin-top: 52px;
+    display: flex; gap: 20px; align-items: center;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s forwards 0.8s;
+  }
+  .btn-primary {
+    padding: 14px 36px;
+    background: var(--dark);
+    color: var(--bg);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+  .btn-ghost {
+    padding: 14px 36px;
+    border: 1px solid var(--border);
+    color: var(--dark);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--dark); transform: translateY(-2px); }
+
+  .hero-line {
+    width: 1px;
+    height: 80px;
+    background: var(--border);
+    margin-top: 80px;
+    opacity: 0;
+    animation: fadeUp 0.8s forwards 1s;
+  }
+
+  /* Section header */
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 60px;
+  }
+
+  /* About */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .about-photo-wrap {
+    position: relative;
+  }
+  .about-photo {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .photo-placeholder {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: var(--border);
+    user-select: none;
+  }
+  .about-deco {
+    position: absolute;
+    bottom: -20px; right: -20px;
+    width: 120px; height: 120px;
+    border: 1px solid var(--accent);
+    z-index: -1;
+  }
+  .about-text p {
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+  .stats-row {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+  .stat-item {}
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: var(--dark);
+    display: block;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* Projects */
+  #loyihalar { background: var(--dark); color: var(--bg); max-width: 100%; }
+  #loyihalar .inner { max-width: 1200px; margin: 0 auto; padding: 120px 60px; }
+  #loyihalar .section-title { color: var(--bg); }
+  #loyihalar .section-label { color: var(--accent); }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .project-card {
+    background: #1A1A18;
+    padding: 40px;
+    transition: background 0.3s;
+    cursor: pointer;
+    border: 1px solid #2A2A27;
+  }
+  .project-card:hover { background: #222220; }
+  .project-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-bottom: 24px;
+    letter-spacing: 0.1em;
+  }
+  .project-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--bg);
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+  .project-desc {
+    font-size: 0.9rem;
+    color: #888880;
+    line-height: 1.7;
+    font-weight: 300;
+    margin-bottom: 28px;
+  }
+  .project-tags {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border: 1px solid #333330;
+    color: #666660;
+  }
+
+  /* Certificates */
+  .certs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .cert-card {
+    padding: 36px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .cert-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  }
+  .cert-icon {
+    width: 48px; height: 48px;
+    min-width: 48px;
+    background: var(--dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+  .cert-info {}
+  .cert-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+  }
+  .cert-org {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .cert-year {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* Contact */
+  #boglanish {
+    background: var(--card);
+    max-width: 100%;
+  }
+  #boglanish .inner {
+    max-width: 1200px; margin: 0 auto; padding: 120px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .contact-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  input, textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 14px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--dark);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  input:focus, textarea:focus { border-color: var(--dark); }
+  textarea { resize: none; height: 120px; }
+  .submit-btn {
+    margin-top: 8px;
+    padding: 16px;
+    background: var(--dark);
+    color: var(--bg);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: background 0.2s;
+  }
+  .submit-btn:hover { background: var(--accent); }
+
+  .contact-info {}
+  .contact-info .section-title { margin-bottom: 30px; }
+  .contact-info p {
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.8;
+    margin-bottom: 40px;
+  }
+  .contact-links { display: flex; flex-direction: column; gap: 16px; }
+  .contact-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--dark);
+    transition: color 0.2s;
+  }
+  .contact-link:hover { color: var(--accent); }
+  .contact-link span { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .contact-link .link-arrow { font-size: 1rem; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    letter-spacing: 0.05em;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    section, #loyihalar .inner, #boglanish .inner { padding: 80px 24px; }
+    .hero { padding: 120px 24px 60px; }
+    .about-grid, .certs-grid, #boglanish .inner { grid-template-columns: 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a class="nav-logo" href="#">Z. Shaxzod</a>
+  <ul class="nav-links">
+    <li><a href="#haqimda">Haqimda</a></li>
+    <li><a href="#loyihalar">Loyihalar</a></li>
+    <li><a href="#sertifikat">Sertifikatlar</a></li>
+    <li><a href="#boglanish">Bog'lanish</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div style="padding: 0 60px;" class="hero" id="home">
+  <p class="hero-eyebrow">Finance Student · Toshkent, Uzbekistan</p>
+  <h1>Zokirov <em>Shaxzod</em> — Finance & Investments.</h1>
+  <p class="hero-desc">TSUE Finance fakulteti talabasi. Stock market, kripto tahlil va moliyaviy hisobot sohasida chuqur bilimga ega.</p>
+  <div class="hero-actions">
+    <a href="#loyihalar" class="btn-primary">Loyihalarni ko'rish</a>
+    <a href="#boglanish" class="btn-ghost">Bog'lanish</a>
+  </div>
+  <div class="hero-line"></div>
+</div>
+
+<!-- ABOUT -->
+<section id="haqimda">
+  <div class="about-grid">
+    <div class="about-photo-wrap reveal">
+      <div class="about-photo">
+        <span class="photo-placeholder">ZS</span>
+      </div>
+      <div class="about-deco"></div>
+    </div>
+    <div class="about-text reveal">
+      <p class="section-label">Men haqimda</p>
+      <h2 class="section-title" style="margin-bottom: 30px;">Moliya — bu<br><em style="font-family:'Playfair Display',serif; font-style:italic;">raqamlar ortidagi hikoya.</em></h2>
+      <p>Men Toshkent Davlat Iqtisodiyot Universitetining Finance fakultetida 3-kurs talabasisman (2023–2027). Moliyaviy buxgalteriya, hisobot va menejment sohasida kuchli nazariy va amaliy bilimga egaman.</p>
+      <p>Fond bozori va kriptovalyuta tahlili bilan qiziqaman. Team leader sifatida kommunikatsiya va jamoaviy ishlash ko'nikmalarim rivojlangan. Maqsadim — Finance sohasida professional mutaxassis bo'lish.</p>
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-num">3</span>
+          <span class="stat-label">Kurs (TSUE)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">B2</span>
+          <span class="stat-label">Ingliz tili</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">2005</span>
+          <span class="stat-label">Tug'ilgan yil</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<div id="loyihalar">
+  <div class="inner">
+    <p class="section-label">Loyihalar</p>
+    <h2 class="section-title">Tanlangan <em style="font-style:italic;">ishlar</em></h2>
+    <div class="projects-grid">
+      <div class="project-card reveal">
+        <p class="project-num">01</p>
+        <h3 class="project-title">Moliyaviy Hisobot Tahlili</h3>
+        <p class="project-desc">Kompaniyalar moliyaviy hisobotlarini (balance sheet, income statement) tahlil qilish va asosiy ko'rsatkichlarni baholash. F7 Financial Reporting bilimi asosida.</p>
+        <div class="project-tags">
+          <span class="tag">F7</span>
+          <span class="tag">IFRS</span>
+          <span class="tag">Analysis</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <p class="project-num">02</p>
+        <h3 class="project-title">Stock Market Tadqiqoti</h3>
+        <p class="project-desc">Fond bozorida turli aksiyalar bo'yicha fundamental va texnik tahlil o'tkazish. Investitsiya imkoniyatlarini aniqlash va portfel strategiyasini ishlab chiqish.</p>
+        <div class="project-tags">
+          <span class="tag">Stock Market</span>
+          <span class="tag">Fundamental</span>
+          <span class="tag">Technical</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <p class="project-num">03</p>
+        <h3 class="project-title">Kripto Valyuta Tahlili</h3>
+        <p class="project-desc">Bitcoin, Ethereum va altcoinlar bo'yicha on-chain ma'lumotlar va bozor trendlarini tahlil qilish. Risk va imkoniyatlarni baholash metodologiyasi.</p>
+        <div class="project-tags">
+          <span class="tag">Crypto</span>
+          <span class="tag">On-chain</span>
+          <span class="tag">DeFi</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <p class="project-num">04</p>
+        <h3 class="project-title">Moliyaviy Buxgalteriya</h3>
+        <p class="project-desc">ACCA F3 Financial Accounting dasturi doirasida hisob-kitob operatsiyalari, trial balance va moliyaviy hisobot tuzish amaliyoti.</p>
+        <div class="project-tags">
+          <span class="tag">F3</span>
+          <span class="tag">ACCA</span>
+          <span class="tag">Accounting</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <p class="project-num">05</p>
+        <h3 class="project-title">Moliyaviy Menejment</h3>
+        <p class="project-desc">Kapital tuzilmasi, investitsiya baholash (NPV, IRR) va aylanma kapital boshqaruvi bo'yicha nazariy va amaliy tadqiqot ishlari.</p>
+        <div class="project-tags">
+          <span class="tag">NPV</span>
+          <span class="tag">IRR</span>
+          <span class="tag">Capital</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <p class="project-num">06</p>
+        <h3 class="project-title">Jamoa Loyihasi — TSUE</h3>
+        <p class="project-desc">Universitetda jamoaviy moliyaviy tadqiqot loyihasiga rahbarlik. Team leader sifatida vazifalarni taqsimlash va natijalarni taqdim etish.</p>
+        <div class="project-tags">
+          <span class="tag">Team Lead</span>
+          <span class="tag">Research</span>
+          <span class="tag">Presentation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CERTIFICATES -->
+<section id="sertifikat">
+  <p class="section-label reveal">Sertifikatlar</p>
+  <h2 class="section-title reveal">Professional <em style="font-family:'Playfair Display',serif;font-style:italic;">malakalar</em></h2>
+  <div class="certs-grid">
+    <div class="cert-card reveal">
+      <div class="cert-icon">📘</div>
+      <div class="cert-info">
+        <p class="cert-org">ACCA</p>
+        <h3 class="cert-name">Financial Accounting — F3</h3>
+        <span class="cert-year">Ko'nikma</span>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">📊</div>
+      <div class="cert-info">
+        <p class="cert-org">ACCA</p>
+        <h3 class="cert-name">Financial Reporting — F7</h3>
+        <span class="cert-year">Ko'nikma</span>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">💼</div>
+      <div class="cert-info">
+        <p class="cert-org">Bilim sohasi</p>
+        <h3 class="cert-name">Financial Management</h3>
+        <span class="cert-year">TSUE — 2023–2027</span>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">🎓</div>
+      <div class="cert-info">
+        <p class="cert-org">Toshkent Davlat Iqtisodiyot Universiteti</p>
+        <h3 class="cert-name">Finance Fakulteti — 3-kurs</h3>
+        <span class="cert-year">2023–2027</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div id="boglanish">
+  <div class="inner">
+    <div class="contact-info reveal">
+      <p class="section-label">Bog'lanish</p>
+      <h2 class="section-title">Loyihangizni<br><em style="font-family:'Playfair Display',serif;font-style:italic;">boshlaylik.</em></h2>
+      <p>Hamkorlik, savol yoki takliflar bo'lsa — xabar yuboring. Imkon qadar tezroq javob beraman.</p>
+      <div class="contact-links">
+        <a href="mailto:zshaxzod27@gmail.com" class="contact-link">
+          <span>zshaxzod27@gmail.com</span>
+          <span class="link-arrow">→</span>
+        </a>
+        <a href="tel:+998906570405" class="contact-link">
+          <span>+998 90 657 04 05</span>
+          <span class="link-arrow">→</span>
+        </a>
+        <a href="https://t.me/blackinvester" target="_blank" class="contact-link">
+          <span>Telegram: @blackinvester</span>
+          <span class="link-arrow">→</span>
+        </a>
+        <a href="#" class="contact-link">
+          <span>Toshkent, O'zbekiston</span>
+          <span class="link-arrow">→</span>
+        </a>
+      </div>
+    </div>
+    <div class="reveal">
+      <form class="contact-form" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label>Ismingiz</label>
+          <input type="text" placeholder="Ismi Familiya" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="email@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Mavzu</label>
+          <input type="text" placeholder="Qanday yordam kerak?" required>
+        </div>
+        <div class="form-group">
+          <label>Xabar</label>
+          <textarea placeholder="Loyihangiz haqida yozing..."></textarea>
+        </div>
+        <button type="submit" class="submit-btn">Xabar yuborish →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 Zokirov Shaxzod Shokirovich — Finance Portfolio. Barcha huquqlar himoyalangan.</p>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('a, button, input, textarea').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '6px';
+      cursor.style.height = '6px';
+      ring.style.width = '52px';
+      ring.style.height = '52px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '10px';
+      cursor.style.height = '10px';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+    });
+  });
+
+  // Navbar scroll
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => obs.observe(el));
+
+  // Form
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.textContent = 'Yuborildi ✓';
+    btn.style.background = '#4A7C4E';
+    setTimeout(() => {
+      btn.textContent = 'Xabar yuborish →';
+      btn.style.background = '';
+      e.target.reset();
+    }, 3000);
+  }
+</script>
+</body>
+</html>
